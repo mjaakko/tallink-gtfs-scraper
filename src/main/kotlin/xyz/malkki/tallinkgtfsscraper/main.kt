@@ -53,7 +53,7 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
     val tallinkTrips = getTallinkTrips(tallinkApi, fromDate, toDate)
 
     fun findSameTrips(trip: Trip, foundTrips: Set<Trip>): List<Trip> {
-        val output = mutableListOf(trip)
+        val output = mutableSetOf(trip)
 
         tallinkTrips.forEach {
             if (it != trip && it.isSameVoyage(trip) && it !in foundTrips) {
