@@ -14,6 +14,9 @@ import java.nio.file.Path
 import java.nio.file.Paths
 import java.time.LocalDate
 import java.time.temporal.ChronoField
+import kotlin.time.DurationUnit
+import kotlin.time.ExperimentalTime
+import kotlin.time.measureTime
 
 /**
  * Creates pairs from the list, e.g. (A, B, C) -> (A-B, A-C, B-C)
@@ -109,6 +112,7 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
     }
 }
 
+@ExperimentalTime
 fun main(vararg args: String) {
     val outputPath = Paths.get(if (args.isNotEmpty()) {
         args[0]
@@ -120,7 +124,16 @@ fun main(vararg args: String) {
 
     val tomorrow = LocalDate.now().plusDays(1)
 
+    val from = tomorrow
+    val to = tomorrow.plusWeeks(4).with(ChronoField.DAY_OF_WEEK, 7)
+
+    println("GTFS will contain data for period from $from to $to")
+
     val httpClient: HttpClient = HttpClient.newBuilder().followRedirects(HttpClient.Redirect.NORMAL).build()
 
-    createTallinkGtfs(httpClient = httpClient, file = outputPath, fromDate = tomorrow, toDate = tomorrow.plusWeeks(4).with(ChronoField.DAY_OF_WEEK, 7))
+    val duration = measureTime {
+        createTallinkGtfs(httpClient = httpClient, file = outputPath, fromDate = from, toDate = to)
+    }
+
+    println("GTFS file created in ${duration.toString(DurationUnit.SECONDS, 2)}")
 }
