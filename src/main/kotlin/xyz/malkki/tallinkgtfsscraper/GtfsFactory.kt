@@ -19,34 +19,36 @@ import java.time.temporal.WeekFields
 fun getCalendarOrCalendarDates(serviceId: String, dates: List<LocalDate>): Pair<Calendar?, List<CalendarDate>?> {
     val sortedDates = dates.toSortedSet()
 
-    val firstWholeWeekFirstDay = sortedDates.first().plusWeeks(1).with(ChronoField.DAY_OF_WEEK, 1)
-    val lastWholeWeekLastDay = sortedDates.last().minusWeeks(1).with(ChronoField.DAY_OF_WEEK, 7)
+    if (sortedDates.first().until(sortedDates.last()).days > 14) {
+        val firstWholeWeekFirstDay = sortedDates.first().plusWeeks(1).with(ChronoField.DAY_OF_WEEK, 1)
+        val lastWholeWeekLastDay = sortedDates.last().minusWeeks(1).with(ChronoField.DAY_OF_WEEK, 7)
 
-    val daysOfWeekByWeek = sortedDates.subSet(firstWholeWeekFirstDay, lastWholeWeekLastDay.plusDays(1))
-        .groupBy { it.get(WeekFields.ISO.weekBasedYear()) to it.get(WeekFields.ISO.weekOfWeekBasedYear()) }
-        .mapValues { (_, days) -> days.map { it.dayOfWeek }.toSet() }
+        val daysOfWeekByWeek = sortedDates.subSet(firstWholeWeekFirstDay, lastWholeWeekLastDay.plusDays(1))
+            .groupBy { it.get(WeekFields.ISO.weekBasedYear()) to it.get(WeekFields.ISO.weekOfWeekBasedYear()) }
+            .mapValues { (_, days) -> days.map { it.dayOfWeek }.toSet() }
 
-    if (daysOfWeekByWeek.values.distinct().count() == 1) {
-        val daysOfWeek = daysOfWeekByWeek.values.first()
+        if (daysOfWeekByWeek.values.distinct().count() == 1) {
+            val daysOfWeek = daysOfWeekByWeek.values.first()
 
-        val firstWeek = sortedDates.headSet(firstWholeWeekFirstDay)
-        val lastWeek = sortedDates.tailSet(lastWholeWeekLastDay.plusDays(1))
+            val firstWeek = sortedDates.headSet(firstWholeWeekFirstDay)
+            val lastWeek = sortedDates.tailSet(lastWholeWeekLastDay.plusDays(1))
 
-        if (firstWeek.map { it.dayOfWeek }.all { it in daysOfWeek } && lastWeek.map { it.dayOfWeek }.all { it in daysOfWeek }) {
-            val calendar = Calendar(
-                serviceId,
-                DayOfWeek.MONDAY in daysOfWeek,
-                DayOfWeek.TUESDAY in daysOfWeek,
-                DayOfWeek.WEDNESDAY in daysOfWeek,
-                DayOfWeek.THURSDAY in daysOfWeek,
-                DayOfWeek.FRIDAY in daysOfWeek,
-                DayOfWeek.SATURDAY in daysOfWeek,
-                DayOfWeek.SUNDAY in daysOfWeek,
-                sortedDates.first(),
-                sortedDates.last()
-            )
+            if (firstWeek.map { it.dayOfWeek }.all { it in daysOfWeek } && lastWeek.map { it.dayOfWeek }.all { it in daysOfWeek }) {
+                val calendar = Calendar(
+                    serviceId,
+                    DayOfWeek.MONDAY in daysOfWeek,
+                    DayOfWeek.TUESDAY in daysOfWeek,
+                    DayOfWeek.WEDNESDAY in daysOfWeek,
+                    DayOfWeek.THURSDAY in daysOfWeek,
+                    DayOfWeek.FRIDAY in daysOfWeek,
+                    DayOfWeek.SATURDAY in daysOfWeek,
+                    DayOfWeek.SUNDAY in daysOfWeek,
+                    sortedDates.first(),
+                    sortedDates.last()
+                )
 
-            return calendar to null
+                return calendar to null
+            }
         }
     }
 
