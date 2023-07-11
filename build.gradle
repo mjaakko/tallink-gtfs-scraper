@@ -1,6 +1,8 @@
 plugins {
     id 'com.github.johnrengelman.shadow' version '8.1.1'
     id 'org.jetbrains.kotlin.jvm' version '1.8.21'
+    id 'application'
+    id 'com.google.cloud.tools.jib' version '3.3.2'
 }
 
 group = 'xyz.malkki'
@@ -30,8 +32,26 @@ dependencies {
     implementation "xyz.malkki:gtfs-library:0.2.1"
 }
 
+application {
+    mainClassName = "xyz.malkki.tallinkgtfsscraper.MainKt"
+}
+
+jib {
+    container {
+        mainClass = mainClassName
+    }
+    to {
+        image = "mjaakko/tallink-gtfs-scraper:edge"
+    }
+}
+
 test {
     useJUnitPlatform()
+}
+
+compileJava {
+    sourceCompatibility = '11'
+    targetCompatibility = '11'
 }
 
 compileKotlin {
