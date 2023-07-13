@@ -89,7 +89,8 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
                 routeId = routeId,
                 serviceId = serviceIdAndTripId,
                 tripId = serviceIdAndTripId,
-                tripHeadsign = stops.find { it.stopId == stopTimes.last().stopId }?.stopName
+                tripHeadsign = stops.find { it.stopId == stopTimes.last().stopId }?.stopName,
+                blockId = serviceIdAndTripId //TODO: think about using ship name in block ID so that we could create estimates for the next trip that the ship will serve
             )
 
             Triple(trip, calendarOrCalendarDates, stopTimes)
