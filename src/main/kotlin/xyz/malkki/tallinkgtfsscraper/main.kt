@@ -98,6 +98,11 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
         .toList()
 
     val trips = tallinkGtfsData.map { it.first }
+
+    //Filter routes that do not have any trips
+    val routeIds = trips.map { it.routeId }.toSet()
+    val routesFiltered = routes.filter { it.routeId in routeIds }
+
     val calendars = tallinkGtfsData.mapNotNull { it.second.first }
     val calendarDates = tallinkGtfsData.flatMap { it.second.second ?: emptyList() }
     val stopTimes = tallinkGtfsData.flatMap { it.third }
@@ -105,7 +110,7 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
     ZipGtfsFeedWriter(file).use {
         it.writeAgencies(agencies)
         it.writeStops(stops)
-        it.writeRoutes(routes)
+        it.writeRoutes(routesFiltered)
         it.writeTrips(trips)
         it.writeCalendars(calendars)
         it.writeCalendarDates(calendarDates)
