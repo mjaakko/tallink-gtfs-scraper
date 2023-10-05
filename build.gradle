@@ -29,7 +29,9 @@ dependencies {
 
     implementation 'commons-codec:commons-codec:1.15'
 
-    implementation "xyz.malkki:gtfs-library:0.2.1"
+    implementation "xyz.malkki:gtfs-library:0.2.2"
+
+    implementation 'de.grundid.opendatalab:geojson-jackson:1.14'
 }
 
 application {

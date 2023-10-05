@@ -1,5 +1,6 @@
 package xyz.malkki.tallinkgtfsscraper
 
+import xyz.malkki.gtfs.model.Shape
 import xyz.malkki.gtfs.serialization.writer.ZipGtfsFeedWriter
 import xyz.malkki.tallinkgtfsscraper.constants.gtfs.agencies
 import xyz.malkki.tallinkgtfsscraper.constants.gtfs.agency
@@ -67,6 +68,26 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
         return output.sortedBy { it.departureIsoDate }.sortedBy { it.arrivalIsoDate }
     }
 
+    val shapeCreator = ShapeCreator()
+
+    val shapeCache = mutableMapOf<List<String>, List<Shape>>()
+
+    fun createShape(stops: List<String>): String? {
+        return if (stops in shapeCache) {
+            shapeCache[stops]!!.first().shapeId
+        } else {
+            val shape = shapeCreator.createShapesForStopIntervals(stops)
+
+            if (shape.isNotEmpty()) {
+                shapeCache[stops] = shape
+
+                shape.first().shapeId
+            } else {
+                null
+            }
+        }
+    }
+
     val tallinkGtfsData = tallinkTrips
         .asSequence()
         .map { trip -> findSameTrips(trip, emptySet()) }
@@ -85,11 +106,14 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
             val calendarOrCalendarDates = getCalendarOrCalendarDates(serviceIdAndTripId, dates)
             val stopTimes = getStopTimes(serviceIdAndTripId, agency.agencyTimezone, tripSet.first())
 
+            val shapeId = createShape(stopTimes.map { it.stopId })
+
             val trip = xyz.malkki.gtfs.model.Trip(
                 routeId = routeId,
                 serviceId = serviceIdAndTripId,
                 tripId = serviceIdAndTripId,
                 tripHeadsign = stops.find { it.stopId == stopTimes.last().stopId }?.stopName,
+                shapeId = shapeId,
                 blockId = serviceIdAndTripId //TODO: think about using ship name in block ID so that we could create estimates for the next trip that the ship will serve
             )
 
@@ -107,6 +131,8 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
     val calendarDates = tallinkGtfsData.flatMap { it.second.second ?: emptyList() }
     val stopTimes = tallinkGtfsData.flatMap { it.third }
 
+    val shapes = shapeCache.values.flatten()
+
     ZipGtfsFeedWriter(file).use {
         it.writeAgencies(agencies)
         it.writeStops(stops)
@@ -115,6 +141,7 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
         it.writeCalendars(calendars)
         it.writeCalendarDates(calendarDates)
         it.writeStopTimes(stopTimes)
+        it.writeShapes(shapes)
     }
 }
 
