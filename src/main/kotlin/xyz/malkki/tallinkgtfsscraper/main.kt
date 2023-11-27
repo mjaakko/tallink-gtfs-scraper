@@ -103,7 +103,7 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
 
             val serviceIdAndTripId = "$routeId-$identity"
 
-            val calendarOrCalendarDates = getCalendarOrCalendarDates(serviceIdAndTripId, dates)
+            val calendarAndCalendarDates = getCalendarAndCalendarDates(serviceIdAndTripId, dates)
             val stopTimes = getStopTimes(serviceIdAndTripId, agency.agencyTimezone, tripSet.first())
 
             val shapeId = createShape(stopTimes.map { it.stopId })
@@ -117,7 +117,7 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
                 blockId = serviceIdAndTripId //TODO: think about using ship name in block ID so that we could create estimates for the next trip that the ship will serve
             )
 
-            Triple(trip, calendarOrCalendarDates, stopTimes)
+            Triple(trip, calendarAndCalendarDates, stopTimes)
         }
         .toList()
 
@@ -128,7 +128,7 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
     val routesFiltered = routes.filter { it.routeId in routeIds }
 
     val calendars = tallinkGtfsData.mapNotNull { it.second.first }
-    val calendarDates = tallinkGtfsData.flatMap { it.second.second ?: emptyList() }
+    val calendarDates = tallinkGtfsData.flatMap { it.second.second }
     val stopTimes = tallinkGtfsData.flatMap { it.third }
 
     val shapes = shapeCache.values.flatten()
