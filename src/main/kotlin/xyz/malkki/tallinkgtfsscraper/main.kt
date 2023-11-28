@@ -1,5 +1,7 @@
 package xyz.malkki.tallinkgtfsscraper
 
+import org.apache.commons.cli.DefaultParser
+import org.apache.commons.cli.Options
 import xyz.malkki.gtfs.model.Shape
 import xyz.malkki.gtfs.serialization.writer.ZipGtfsFeedWriter
 import xyz.malkki.tallinkgtfsscraper.constants.gtfs.agencies
@@ -12,7 +14,6 @@ import xyz.malkki.tallinkgtfsscraper.tallinkapi.model.Trip
 import xyz.malkki.tallinkgtfsscraper.tallinkapi.model.Trips
 import java.net.http.HttpClient
 import java.nio.file.Path
-import java.nio.file.Paths
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 import kotlin.time.DurationUnit
@@ -147,11 +148,21 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
 
 @ExperimentalTime
 fun main(vararg args: String) {
-    val outputPath = Paths.get(if (args.isNotEmpty()) {
-        args[0]
-    } else {
-        "tallink.zip"
-    })
+    val outputPathString = when (args.size) {
+        0 -> "tallink.zip"
+        1 -> args[0]
+        else -> {
+            val options = Options().apply {
+                addRequiredOption("o", "output", true, "Path to the output file")
+            }
+            val cliParser = DefaultParser()
+
+            val cli = cliParser.parse(options, args)
+
+            cli.getOptionValue("o")
+        }
+    }
+    val outputPath = Path.of(outputPathString)
 
     println("Writing GTFS file to ${outputPath.toAbsolutePath()}")
 
