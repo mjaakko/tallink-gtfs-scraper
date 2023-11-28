@@ -15,7 +15,7 @@ import xyz.malkki.tallinkgtfsscraper.tallinkapi.model.Trips
 import java.net.http.HttpClient
 import java.nio.file.Path
 import java.time.LocalDate
-import java.time.temporal.ChronoField
+import kotlin.system.exitProcess
 import kotlin.time.DurationUnit
 import kotlin.time.measureTime
 
@@ -145,29 +145,40 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
     }
 }
 
+private const val DEFAULT_DAYS = 31L
+
+data class Params(val days: Long, val outputPath: String)
+
 fun main(vararg args: String) {
-    val outputPathString = when (args.size) {
-        0 -> "tallink.zip"
-        1 -> args[0]
+    val params = when (args.size) {
+        0 -> Params(DEFAULT_DAYS, "tallink.zip",)
+        1 -> Params(DEFAULT_DAYS, args[0],)
         else -> {
             val options = Options().apply {
                 addRequiredOption("o", "output", true, "Path to the output file")
+                addRequiredOption("d", "days", true, "Number of days to include in the GTFS")
             }
             val cliParser = DefaultParser()
 
             val cli = cliParser.parse(options, args)
 
-            cli.getOptionValue("o")
+            Params(cli.getOptionValue("d").toLong(), cli.getOptionValue("o"),)
         }
     }
-    val outputPath = Path.of(outputPathString)
+
+    if (params.days < 2) {
+        println("Cannot generate GTFS for less than 2 days")
+        exitProcess(1)
+    }
+
+    val outputPath = Path.of(params.outputPath)
 
     println("Writing GTFS file to ${outputPath.toAbsolutePath()}")
 
     val tomorrow = LocalDate.now().plusDays(1)
 
     val from = tomorrow
-    val to = tomorrow.plusWeeks(4).with(ChronoField.DAY_OF_WEEK, 7)
+    val to = tomorrow.plusDays(params.days)
 
     println("GTFS will contain data for period from $from to $to")
 
