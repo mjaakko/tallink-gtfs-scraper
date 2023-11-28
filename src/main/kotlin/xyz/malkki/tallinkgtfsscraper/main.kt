@@ -17,7 +17,6 @@ import java.nio.file.Path
 import java.time.LocalDate
 import java.time.temporal.ChronoField
 import kotlin.time.DurationUnit
-import kotlin.time.ExperimentalTime
 import kotlin.time.measureTime
 
 /**
@@ -146,7 +145,6 @@ fun createTallinkGtfs(httpClient: HttpClient, file: Path, fromDate: LocalDate, t
     }
 }
 
-@ExperimentalTime
 fun main(vararg args: String) {
     val outputPathString = when (args.size) {
         0 -> "tallink.zip"
