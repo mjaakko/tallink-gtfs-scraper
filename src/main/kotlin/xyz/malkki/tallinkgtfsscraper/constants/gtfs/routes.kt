@@ -14,3 +14,4 @@ val routes = tallinkRoutesByPiers
             routeType = 4
         )
     }
+    .distinct()

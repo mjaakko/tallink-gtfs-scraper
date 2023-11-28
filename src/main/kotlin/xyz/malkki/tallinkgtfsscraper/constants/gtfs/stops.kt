@@ -10,7 +10,7 @@ import xyz.malkki.tallinkgtfsscraper.constants.TALLINN_TIMEZONE
 val stops = listOf(
     Stop(
         stopId = "LSA2",
-        stopName = "Helsinki (West Harbour)",
+        stopName = "Helsinki (West\u00a0Harbour)",
         stopLat = 60.14938,
         stopLon = 24.91470,
         stopTimezone = HELSINKI_TIMEZONE,
@@ -18,7 +18,7 @@ val stops = listOf(
     ),
     Stop(
         stopId = "OLYM",
-        stopName = "Helsinki (Olympia Terminal)",
+        stopName = "Helsinki (Olympia\u00a0Terminal)",
         stopLat = 60.16077,
         stopLon = 24.95923,
         stopTimezone = HELSINKI_TIMEZONE,

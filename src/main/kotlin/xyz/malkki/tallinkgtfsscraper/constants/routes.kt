@@ -5,6 +5,7 @@ val tallinkRoutesByCities = listOf(
     listOf("HEL", "ALA", "STO"),
     listOf("TAL", "ALA", "STO"),
     listOf("TUR", "ALA", "STO"),
+    listOf("TUR", "ALA", "KAP"),
     listOf("HEL", "TAL"),
 ).flatMap {
     listOf(it, it.reversed())
@@ -18,6 +19,7 @@ val tallinkRoutesByPiers = listOf(
     listOf("TSAT", "MHAM", "VHAM"),
     listOf("TSAT", "LNAS", "VHAM"),
     listOf("TSAT", "LNAS", "KAPE"),
+    listOf("TSAT", "MHAM", "KAPE"),
 ).flatMap {
     listOf(it, it.reversed())
 }
