@@ -21,7 +21,7 @@ jobs:
           distribution: 'temurin'
           java-version: '11'
       - name: Build Docker image with Jib
-        uses: gradle/gradle-build-action@v2
+        uses: gradle/gradle-build-action@v3
         with:
           arguments: jib -Djib.to.auth.username=${{ secrets.DOCKERHUB_USERNAME }} -Djib.to.auth.password=${{ secrets.DOCKERHUB_TOKEN }}
         env:
