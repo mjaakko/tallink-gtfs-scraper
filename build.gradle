@@ -29,7 +29,7 @@ dependencies {
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 
-    implementation 'commons-codec:commons-codec:1.16.0'
+    implementation 'commons-codec:commons-codec:1.16.1'
     implementation 'commons-cli:commons-cli:1.6.0'
 
     implementation "xyz.malkki:gtfs-library:0.2.2"
