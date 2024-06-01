@@ -24,7 +24,7 @@ repositories {
 dependencies {
     testImplementation 'org.jetbrains.kotlin:kotlin-test'
 
-    implementation platform('com.fasterxml.jackson:jackson-bom:2.17.0')
+    implementation platform('com.fasterxml.jackson:jackson-bom:2.17.1')
     implementation 'com.fasterxml.jackson.core:jackson-databind'
     implementation 'com.fasterxml.jackson.module:jackson-module-kotlin'
     implementation 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
